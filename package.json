@@ -1,6 +1,6 @@
 {
   "name": "react-native-gauge-3d",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "A customizable SVG-based gauge component for React Native with dark mode, alerts, range indicators, animation support, and built-in settings panel",
   "keywords": [
     "react-native",

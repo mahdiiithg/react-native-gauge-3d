@@ -9,7 +9,7 @@ import {
   Switch,
   Animated,
 } from 'react-native';
-import Svg, { Circle, Path, G, Text as SvgText, Defs, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, Path, G, Text as SvgText } from 'react-native-svg';
 import { useElementSize } from './hooks/useElementSize';
 import { getSpeedColor } from './utils/getSpeedColor';
 import { SettingsIcon, AlarmOnIcon, AlarmOffIcon } from './icons';
@@ -28,6 +28,10 @@ const SettingsPanel = ({
   size,
 }) => {
   const [localSettings, setLocalSettings] = useState(settings);
+
+  useEffect(() => {
+    setLocalSettings(settings);
+  }, [settings]);
 
   const handleChange = (key, value) => {
     setLocalSettings((prev) => ({ ...prev, [key]: value }));
@@ -77,6 +81,23 @@ const SettingsPanel = ({
     },
     fieldContainer: {
       marginBottom: size * 0.045,
+    },
+    fieldOptions: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      marginTop: 6,
+    },
+    optionButton: {
+      borderRadius: 999,
+      borderWidth: 1,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      marginRight: 8,
+      marginBottom: 8,
+    },
+    optionButtonText: {
+      fontSize: fontSize * 0.9,
+      fontWeight: '500',
     },
     fieldLabel: {
       fontSize: fontSize * 0.95,
@@ -151,6 +172,43 @@ const SettingsPanel = ({
                   thumbColor="#fff"
                 />
               </View>
+            ) : config.type === 'select' ? (
+              <>
+                <Text style={styles.fieldLabel}>{config.label || key}</Text>
+                <View style={styles.fieldOptions}>
+                  {(config.options || []).map((option) => {
+                    const normalizedOption = typeof option === 'object'
+                      ? option
+                      : { label: String(option), value: option };
+                    const isSelected = localSettings[key] === normalizedOption.value;
+
+                    return (
+                      <TouchableOpacity
+                        key={`${key}-${normalizedOption.value}`}
+                        style={[
+                          styles.optionButton,
+                          {
+                            borderColor: isSelected ? '#1890ff' : (isDarkMode ? '#555' : '#ccc'),
+                            backgroundColor: isSelected
+                              ? '#1890ff'
+                              : (isDarkMode ? '#3a3a3a' : '#fff'),
+                          },
+                        ]}
+                        onPress={() => handleChange(key, normalizedOption.value)}
+                      >
+                        <Text
+                          style={[
+                            styles.optionButtonText,
+                            { color: isSelected ? '#fff' : (isDarkMode ? '#fff' : '#333') },
+                          ]}
+                        >
+                          {normalizedOption.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </>
             ) : (
               <>
                 <Text style={styles.fieldLabel}>{config.label || key}</Text>
@@ -209,6 +267,7 @@ const SettingsPanel = ({
  * @param {Function} [props.convertValue] - Optional function to convert display value
  * @param {number} [props.decimalPlaces=2] - Decimal places for displayed value
  * @param {boolean} [props.canEdit=false] - Show edit button
+ * @param {boolean} [props.disableEditButton=false] - Hide the edit button
  * @param {Function} [props.onEditClick] - Callback when edit button is clicked
  * @param {Function} [props.renderController] - Render prop for custom controller at bottom
  * @param {Function} [props.renderEditor] - Render prop for custom editor overlay
@@ -258,6 +317,7 @@ const Gauge = ({
 
   // Edit mode
   canEdit = false,
+  disableEditButton = false,
   onEditClick,
 
   // Render props for extensibility
@@ -437,23 +497,36 @@ const Gauge = ({
     [gaugeConfig, minValue, maxValue]
   );
 
-  // Generate alert zone path (pie slice)
-  const getAlertZonePath = useCallback(
-    (zoneStart, zoneEnd) => {
+  // Generate a ring segment path so alert and range bands stay at the outer edge.
+  const getBandPath = useCallback(
+    (zoneStart, zoneEnd, outerRadius, innerRadius) => {
       const { centerX, centerY, radius, startAngle, angleRange } = gaugeConfig;
       const startNorm = (Math.max(minValue, Math.min(maxValue, zoneStart)) - minValue) / (maxValue - minValue);
       const endNorm = (Math.max(minValue, Math.min(maxValue, zoneEnd)) - minValue) / (maxValue - minValue);
       const startA = startAngle + startNorm * angleRange;
       const endA = startAngle + endNorm * angleRange;
 
-      const x1 = centerX + radius * Math.cos(startA);
-      const y1 = centerY + radius * Math.sin(startA);
-      const x2 = centerX + radius * Math.cos(endA);
-      const y2 = centerY + radius * Math.sin(endA);
+      const effectiveOuterRadius = outerRadius ?? radius;
+      const effectiveInnerRadius = innerRadius ?? Math.max(radius - 16, 0);
+
+      const outerStartX = centerX + effectiveOuterRadius * Math.cos(startA);
+      const outerStartY = centerY + effectiveOuterRadius * Math.sin(startA);
+      const outerEndX = centerX + effectiveOuterRadius * Math.cos(endA);
+      const outerEndY = centerY + effectiveOuterRadius * Math.sin(endA);
+      const innerStartX = centerX + effectiveInnerRadius * Math.cos(startA);
+      const innerStartY = centerY + effectiveInnerRadius * Math.sin(startA);
+      const innerEndX = centerX + effectiveInnerRadius * Math.cos(endA);
+      const innerEndY = centerY + effectiveInnerRadius * Math.sin(endA);
 
       const largeArcFlag = endA - startA > Math.PI ? 1 : 0;
 
-      return `M ${centerX} ${centerY} L ${x1} ${y1} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`;
+      return [
+        `M ${outerStartX} ${outerStartY}`,
+        `A ${effectiveOuterRadius} ${effectiveOuterRadius} 0 ${largeArcFlag} 1 ${outerEndX} ${outerEndY}`,
+        `L ${innerEndX} ${innerEndY}`,
+        `A ${effectiveInnerRadius} ${effectiveInnerRadius} 0 ${largeArcFlag} 0 ${innerStartX} ${innerStartY}`,
+        'Z',
+      ].join(' ');
     },
     [gaugeConfig, minValue, maxValue]
   );
@@ -484,15 +557,67 @@ const Gauge = ({
     setShowSettingsPanel(false);
   };
 
-  const currentSettings = {
+  const currentSettings = useMemo(() => {
+    if (!settingsConfig) {
+      return {};
+    }
+
+    const availableSettings = {
+      value,
+      minValue,
+      maxValue,
+      label,
+      unit,
+      size,
+      isDarkMode,
+      majorTicksCount,
+      minorTicksCount,
+      alertEnabled,
+      alertHigh,
+      alertLow,
+      alertSnoozed,
+      showRange,
+      rangeMin,
+      rangeMax,
+      showArc,
+      animated,
+      animationDuration,
+      decimalPlaces,
+      digitalValue,
+      digitalUnit,
+      secondaryLabel,
+    };
+
+    return Object.keys(settingsConfig).reduce((accumulator, key) => {
+      accumulator[key] = availableSettings[key];
+      return accumulator;
+    }, {});
+  }, [
+    settingsConfig,
+    value,
     minValue,
     maxValue,
     label,
     unit,
+    size,
+    isDarkMode,
+    majorTicksCount,
+    minorTicksCount,
     alertEnabled,
     alertHigh,
     alertLow,
-  };
+    alertSnoozed,
+    showRange,
+    rangeMin,
+    rangeMax,
+    showArc,
+    animated,
+    animationDuration,
+    decimalPlaces,
+    digitalValue,
+    digitalUnit,
+    secondaryLabel,
+  ]);
 
   const tickColor = isDarkMode ? '#ffffff' : '#000000';
   const backgroundColor = isDarkMode ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)';
@@ -501,6 +626,8 @@ const Gauge = ({
 
   const { centerX, centerY, radius } = gaugeConfig;
   const centerCircleRadius = (effectiveSize <= 300 ? 27 : 35) * (effectiveSize / 300);
+  const settingsButtonSize = Math.max(28, centerCircleRadius * 1.45);
+  const settingsIconSize = Math.max(16, centerCircleRadius * 0.7);
   const scaleFactor = effectiveSize / 300;
   const fontSize = Math.max(8, 14 * scaleFactor);
 
@@ -532,13 +659,19 @@ const Gauge = ({
       position: 'absolute',
       top: '50%',
       left: '50%',
-      width: centerCircleRadius * 2,
-      height: centerCircleRadius * 2,
-      marginLeft: -centerCircleRadius,
-      marginTop: -centerCircleRadius,
-      borderRadius: centerCircleRadius,
+      width: settingsButtonSize,
+      height: settingsButtonSize,
+      marginLeft: -(settingsButtonSize / 2),
+      marginTop: -(settingsButtonSize / 2),
+      borderRadius: settingsButtonSize / 2,
       alignItems: 'center',
       justifyContent: 'center',
+      backgroundColor: isDarkMode ? 'rgba(255,255,255,0.92)' : 'rgba(0,0,0,0.82)',
+      zIndex: 12,
+      elevation: 4,
+    },
+    settingsHitAreaHidden: {
+      opacity: 0,
     },
     settingsOverlay: {
       position: 'absolute',
@@ -578,7 +711,7 @@ const Gauge = ({
   return (
     <View style={[styles.container, style]} onLayout={onLayout}>
       {/* Edit Button */}
-      {canEdit && (
+      {canEdit && !disableEditButton && (
         <TouchableOpacity style={styles.editButton} onPress={handleEditClick}>
           <SettingsIcon size={effectiveSize * 0.1} color="#000" />
         </TouchableOpacity>
@@ -586,13 +719,6 @@ const Gauge = ({
 
       <View style={styles.gaugeContainer}>
         <Svg width={effectiveSize} height={effectiveSize}>
-          <Defs>
-            <RadialGradient id="alertGradient" cx="50%" cy="50%" r="50%">
-              <Stop offset="80%" stopColor="rgba(255, 0, 0, 0)" />
-              <Stop offset="100%" stopColor="rgba(255, 0, 0, 1)" />
-            </RadialGradient>
-          </Defs>
-
           {/* Background Circle */}
           <Circle
             cx={centerX}
@@ -612,25 +738,27 @@ const Gauge = ({
           {/* High Alert Zone */}
           {alertEnabled && alertHigh !== undefined && alertHigh <= maxValue && (
             <Path
-              d={getAlertZonePath(alertHigh, maxValue)}
-              fill="url(#alertGradient)"
+              d={getBandPath(alertHigh, maxValue, radius + 4 * scaleFactor, radius - 16 * scaleFactor)}
+              fill="rgba(255, 0, 0, 0.95)"
             />
           )}
 
           {/* Low Alert Zone */}
           {alertEnabled && alertLow !== undefined && alertLow >= minValue && (
             <Path
-              d={getAlertZonePath(minValue, alertLow)}
-              fill="url(#alertGradient)"
+              d={getBandPath(minValue, alertLow, radius + 4 * scaleFactor, radius - 16 * scaleFactor)}
+              fill="rgba(255, 0, 0, 0.95)"
             />
           )}
 
           {/* Range Indicator */}
           {showRange && rangeMin !== undefined && rangeMax !== undefined && (
             <Path
-              d={getAlertZonePath(
+              d={getBandPath(
                 Math.max(minValue, Math.min(maxValue, convert(rangeMin))),
-                Math.max(minValue, Math.min(maxValue, convert(rangeMax)))
+                Math.max(minValue, Math.min(maxValue, convert(rangeMax))),
+                radius - 2 * scaleFactor,
+                radius - 14 * scaleFactor
               )}
               fill={isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.17)'}
             />
@@ -785,9 +913,17 @@ const Gauge = ({
         {/* Settings Touch Area */}
         {settingsConfig && onSettingsChange && (
           <TouchableOpacity
-            style={styles.settingsHitArea}
+            style={[
+              styles.settingsHitArea,
+              showSettingsPanel && styles.settingsHitAreaHidden,
+            ]}
             onPress={handleSettingsIconClick}
-          />
+          >
+            <SettingsIcon
+              size={settingsIconSize}
+              color={isDarkMode ? '#333' : '#fff'}
+            />
+          </TouchableOpacity>
         )}
 
         {/* Controller Slot */}

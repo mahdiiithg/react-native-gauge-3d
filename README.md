@@ -24,7 +24,6 @@ A customizable, SVG-based gauge component for React Native. Features include dar
 - **Unit Conversion** - Optional value conversion function support
 
 ## Installation
-## Installation
 
 ```bash
 # npm
@@ -136,6 +135,7 @@ function App() {
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `canEdit` | `boolean` | `false` | Allow tap-to-edit value |
+| `disableEditButton` | `boolean` | `false` | Hide the edit button while keeping editor support |
 | `onEditClick` | `function` | - | Callback when value is edited |
 
 ### Built-in Settings Panel Props
@@ -150,11 +150,15 @@ function App() {
 ```javascript
 {
   fieldName: {
-    type: 'number' | 'text' | 'toggle',
+    type: 'number' | 'text' | 'toggle' | 'select',
     label: 'Display Label',
     min: 0,           // for number type
     max: 100,         // for number type
     step: 1,          // for number type
+    options: [        // for select type
+      { label: 'Option A', value: 'a' },
+      { label: 'Option B', value: 'b' }
+    ]
   }
 }
 ```
