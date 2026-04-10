@@ -9,7 +9,7 @@ import {
   Switch,
   Animated,
 } from 'react-native';
-import Svg, { Circle, Path, G, Text as SvgText, Defs, RadialGradient, Stop, Arc } from 'react-native-svg';
+import Svg, { Circle, Path, G, Text as SvgText, Defs, RadialGradient, Stop } from 'react-native-svg';
 import { useElementSize } from './hooks/useElementSize';
 import { getSpeedColor } from './utils/getSpeedColor';
 import { SettingsIcon, AlarmOnIcon, AlarmOffIcon } from './icons';

@@ -1,6 +1,6 @@
 {
   "name": "react-native-gauge-3d",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A customizable SVG-based gauge component for React Native with dark mode, alerts, range indicators, animation support, and built-in settings panel",
   "keywords": [
     "react-native",
@@ -29,13 +29,16 @@
   },
   "license": "MIT",
   "author": "Mahdi Tahavorgar <https://github.com/mahdiiithg>",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "react-native": "dist/index.js",
   "files": [
-    "src"
+    "dist"
   ],
   "scripts": {
+    "build": "babel src --out-dir dist --extensions .js,.jsx --copy-files",
     "lint": "eslint src/",
-    "prepare": "echo 'No build step required - ships source files'"
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
@@ -43,6 +46,10 @@
     "react-native-svg": ">=12.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
+    "@babel/preset-react": "^7.27.1",
     "eslint": "^8.57.0"
   }
 }

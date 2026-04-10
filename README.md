@@ -24,7 +24,6 @@ A customizable, SVG-based gauge component for React Native. Features include dar
 - **Unit Conversion** - Optional value conversion function support
 
 ## Installation
-
 ## Installation
 
 ```bash
@@ -55,6 +54,8 @@ cd ios && pod install
 ## Quick Start
 
 ```jsx
+import React from 'react';
+import { View } from 'react-native';
 import { Gauge } from 'react-native-gauge-3d';
 
 function App() {
@@ -363,10 +364,10 @@ import {
 
 // useElementSize example
 const Component = () => {
-  const { elementRef, elementSize } = useElementSize();
+  const { onLayout, elementSize } = useElementSize();
   console.log(elementSize.width, elementSize.height);
   
-  return <View ref={elementRef}>...</View>;
+  return <View onLayout={onLayout}>...</View>;
 };
 
 // getSpeedColor example
