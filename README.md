@@ -2,13 +2,13 @@
 
 [![npm version](https://img.shields.io/npm/v/react-native-gauge-3d.svg)](https://www.npmjs.com/package/react-native-gauge-3d)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-gauge-3d.svg)](https://www.npmjs.com/package/react-native-gauge-3d)
-[![license](https://img.shields.io/npm/l/react-native-gauge-3d.svg)](https://github.com/mahdiiithg/react-native-gauge/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/mahdiiithg/react-native-gauge.svg)](https://github.com/mahdiiithg/react-native-gauge)
+[![license](https://img.shields.io/npm/l/react-native-gauge-3d.svg)](https://github.com/mahdiiithg/react-native-gauge-3d/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/mahdiiithg/react-native-gauge-3d.svg)](https://github.com/mahdiiithg/react-native-gauge-3d)
 
 A customizable, SVG-based gauge component for React Native. Features include dark mode support, alert zones, range indicators, smooth animations, and render prop extensibility. Perfect for dashboards, monitoring panels, and data visualization applications on iOS and Android.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/mahdiiithg/react-native-gauge/main/docs/assets/demo.gif" alt="react-native-gauge demo" width="400" />
+  <img src="https://raw.githubusercontent.com/mahdiiithg/react-native-gauge-3d/main/docs/assets/demo.gif" alt="react-native-gauge demo" width="400" />
 </p>
 
 ## Features
