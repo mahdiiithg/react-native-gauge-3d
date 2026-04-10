@@ -1,0 +1,48 @@
+{
+  "name": "react-native-gauge-3d",
+  "version": "1.0.0",
+  "description": "A customizable SVG-based gauge component for React Native with dark mode, alerts, range indicators, animation support, and built-in settings panel",
+  "keywords": [
+    "react-native",
+    "gauge",
+    "svg",
+    "chart",
+    "speedometer",
+    "meter",
+    "dial",
+    "dashboard",
+    "visualization",
+    "dark-mode",
+    "alert",
+    "component",
+    "expo",
+    "ios",
+    "android"
+  ],
+  "homepage": "https://github.com/mahdiiithg/react-native-gauge#readme",
+  "bugs": {
+    "url": "https://github.com/mahdiiithg/react-native-gauge/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mahdiiithg/react-native-gauge.git"
+  },
+  "license": "MIT",
+  "author": "Mahdi Tahavorgar <https://github.com/mahdiiithg>",
+  "main": "src/index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "lint": "eslint src/",
+    "prepare": "echo 'No build step required - ships source files'"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-native": ">=0.60.0",
+    "react-native-svg": ">=12.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
+}
