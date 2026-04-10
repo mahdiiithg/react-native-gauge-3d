@@ -1,0 +1,33 @@
+# Development files
+.git/
+.github/
+.vscode/
+.idea/
+
+# Tests
+__tests__/
+*.test.js
+*.spec.js
+
+# Examples
+examples/
+demo/
+
+# Documentation source
+docs/
+
+# Config files
+.eslintrc*
+.prettierrc*
+.editorconfig
+.gitattributes
+tsconfig.json
+
+# CI
+.travis.yml
+.gitlab-ci.yml
+circle.yml
+
+# Misc
+*.log
+.DS_Store
