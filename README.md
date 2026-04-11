@@ -414,4 +414,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-If you find this package useful, please consider giving it a ⭐ on [GitHub](https://github.com/mahdiiithg/react-native-gauge)!
+If you find this package useful, please consider giving it a ⭐ on [GitHub](https://github.com/mahdiiithg/react-native-gauge-3d)!
