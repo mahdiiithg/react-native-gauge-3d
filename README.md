@@ -400,9 +400,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Links
 
-- [GitHub Repository](https://github.com/mahdiiithg/react-native-gauge)
+- [GitHub Repository](https://github.com/mahdiiithg/react-native-gauge-3d)
 - [npm Package](https://www.npmjs.com/package/react-native-gauge-3d)
-- [Issue Tracker](https://github.com/mahdiiithg/react-native-gauge/issues)
+- [Issue Tracker](https://github.com/mahdiiithg/react-native-gauge-3d/issues)
 - [Changelog](CHANGELOG.md)
 
 ## Author
@@ -414,4 +414,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-If you find this package useful, please consider giving it a ⭐ on [GitHub](https://github.com/mahdiiithg/react-native-gauge)!
+If you find this package useful, please consider giving it a ⭐ on [GitHub](https://github.com/mahdiiithg/react-native-gauge-3d)!
